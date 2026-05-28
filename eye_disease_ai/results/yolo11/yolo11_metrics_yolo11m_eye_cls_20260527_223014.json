@@ -1,0 +1,18 @@
+{
+  "model": "YOLO11m",
+  "run_name": "yolo11m_eye_cls_20260527_223014",
+  "timestamp": "2026-05-27T22:33:07.184283",
+  "accuracy": 0.5893719806763285,
+  "precision": 0.6048045224072663,
+  "recall": 0.5893719806763285,
+  "f1_score": 0.5497639421288703,
+  "avg_inference_ms": 30.590551026201478,
+  "total_test_images": 1035,
+  "class_names": [
+    "cataract",
+    "diabetic_retinopathy",
+    "glaucoma",
+    "normal",
+    "retina_disease"
+  ]
+}

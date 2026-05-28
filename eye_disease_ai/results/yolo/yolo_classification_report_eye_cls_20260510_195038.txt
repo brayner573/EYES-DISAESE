@@ -1,0 +1,20 @@
+YOLOv8 Classification Report — eye_cls_20260510_195038
+============================================================
+
+                      precision    recall  f1-score   support
+
+            cataract       0.88      0.89      0.89       176
+diabetic_retinopathy       0.88      0.95      0.91       504
+            glaucoma       0.79      0.70      0.74       171
+              normal       0.77      0.74      0.76       227
+      retina_disease       0.71      0.33      0.45        15
+
+            accuracy                           0.85      1093
+           macro avg       0.81      0.72      0.75      1093
+        weighted avg       0.84      0.85      0.84      1093
+
+Accuracy  : 0.8481
+Precision : 0.8443
+Recall    : 0.8481
+F1-score  : 0.8442
+Avg inference: 27.8 ms

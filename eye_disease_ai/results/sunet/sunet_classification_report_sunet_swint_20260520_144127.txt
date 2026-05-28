@@ -1,0 +1,19 @@
+Swin-T Classification Report — sunet_swint_20260520_144127
+=================================================================
+
+                      precision    recall  f1-score   support
+
+            cataract       0.89      0.91      0.90       201
+diabetic_retinopathy       0.93      0.92      0.92       665
+            glaucoma       0.90      0.72      0.80       193
+              normal       0.68      0.75      0.71       227
+      retina_disease       0.43      0.87      0.58        15
+
+            accuracy                           0.86      1301
+           macro avg       0.77      0.83      0.78      1301
+        weighted avg       0.87      0.86      0.86      1301
+
+Accuracy: 0.8593
+Precision: 0.8692
+Recall: 0.8593
+F1-score: 0.8615

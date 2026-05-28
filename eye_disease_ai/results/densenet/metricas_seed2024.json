@@ -1,0 +1,43 @@
+{
+  "model": "DenseNet121",
+  "seed": 2024,
+  "accuracy": 0.6,
+  "precision_weighted": 1.0,
+  "recall_weighted": 0.6,
+  "f1_weighted": 0.75,
+  "auc_roc_macro": 0.5,
+  "avg_latency_ms": 145.87388038635254,
+  "total_test_images": 10,
+  "classes": {
+    "cataract": {
+      "precision": 1.0,
+      "recall": 0.6,
+      "f1_score": 0.75,
+      "support": 10
+    },
+    "diabetic_retinopathy": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "support": 0
+    },
+    "glaucoma": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "support": 0
+    },
+    "normal": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "support": 0
+    },
+    "retina_disease": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "support": 0
+    }
+  }
+}

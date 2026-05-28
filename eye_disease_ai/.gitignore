@@ -40,7 +40,6 @@ models/**/weights/
 *.engine
 
 # ─── Resultados (generados) ──────────────────────────────────
-results/
 logs/
 
 # ─── Jupyter ──────────────────────────────────────────────────

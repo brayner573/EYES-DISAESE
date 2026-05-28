@@ -37,10 +37,8 @@ eye_disease_ai/models/**/weights/
 *.engine
 
 # ─── Results & Logs ────────────────────────────────────────────────────────
-eye_disease_ai/results/
 eye_disease_ai/logs/
 eye_disease_ai/runs/
-results/
 logs/
 runs/
 *.log

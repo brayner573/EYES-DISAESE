@@ -1,0 +1,19 @@
+EfficientNetV2-S Classification Report — efficientnet_20260527_214026
+=================================================================
+
+                      precision    recall  f1-score   support
+
+            cataract       0.93      0.41      0.57       201
+diabetic_retinopathy       0.65      0.94      0.77       665
+            glaucoma       0.43      0.40      0.42       193
+              normal       0.11      0.00      0.01       227
+      retina_disease       0.17      0.67      0.27        15
+
+            accuracy                           0.61      1301
+           macro avg       0.46      0.49      0.41      1301
+        weighted avg       0.56      0.61      0.55      1301
+
+Accuracy: 0.6134
+Precision: 0.5620
+Recall: 0.6134
+F1-score: 0.5479

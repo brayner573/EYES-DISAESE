@@ -1,0 +1,19 @@
+DenseNet121 Classification Report — densenet121_20260527_212553
+=================================================================
+
+                      precision    recall  f1-score   support
+
+            cataract       0.90      0.68      0.77       201
+diabetic_retinopathy       0.89      0.55      0.68       665
+            glaucoma       0.79      0.46      0.58       193
+              normal       0.36      0.76      0.48       227
+      retina_disease       0.10      1.00      0.19        15
+
+            accuracy                           0.60      1301
+           macro avg       0.61      0.69      0.54      1301
+        weighted avg       0.77      0.60      0.64      1301
+
+Accuracy: 0.5957
+Precision: 0.7740
+Recall: 0.5957
+F1-score: 0.6380

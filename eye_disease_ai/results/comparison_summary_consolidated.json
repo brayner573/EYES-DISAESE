@@ -1,0 +1,290 @@
+{
+  "resnet50": {
+    "accuracy": {
+      "mean": 0.8000000000000002,
+      "std": 1.1102230246251565e-16
+    },
+    "precision_weighted": {
+      "mean": 1.0,
+      "std": 0.0
+    },
+    "recall_weighted": {
+      "mean": 0.8000000000000002,
+      "std": 1.1102230246251565e-16
+    },
+    "f1_weighted": {
+      "mean": 0.888888888888889,
+      "std": 0.0
+    },
+    "auc_roc_macro": {
+      "mean": 0.5,
+      "std": 0.0
+    },
+    "avg_latency_ms": {
+      "mean": 71.0281769434611,
+      "std": 3.651888029567399
+    },
+    "classes_f1": {
+      "cataract": {
+        "mean": 0.8888888888888888,
+        "std": 0.0
+      },
+      "diabetic_retinopathy": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "glaucoma": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "normal": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "retina_disease": {
+        "mean": 0.0,
+        "std": 0.0
+      }
+    }
+  },
+  "densenet121": {
+    "accuracy": {
+      "mean": 0.7000000000000001,
+      "std": 0.14142135623730953
+    },
+    "precision_weighted": {
+      "mean": 1.0,
+      "std": 0.0
+    },
+    "recall_weighted": {
+      "mean": 0.7000000000000001,
+      "std": 0.14142135623730953
+    },
+    "f1_weighted": {
+      "mean": 0.8157894736842105,
+      "std": 0.09304036594559834
+    },
+    "auc_roc_macro": {
+      "mean": 0.5,
+      "std": 0.0
+    },
+    "avg_latency_ms": {
+      "mean": 140.03640015920004,
+      "std": 4.1506425973719105
+    },
+    "classes_f1": {
+      "cataract": {
+        "mean": 0.8157894736842105,
+        "std": 0.09304036594559834
+      },
+      "diabetic_retinopathy": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "glaucoma": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "normal": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "retina_disease": {
+        "mean": 0.0,
+        "std": 0.0
+      }
+    }
+  },
+  "efficientnet": {
+    "accuracy": {
+      "mean": 0.6333333333333333,
+      "std": 0.16996731711975951
+    },
+    "precision_weighted": {
+      "mean": 1.0,
+      "std": 0.0
+    },
+    "recall_weighted": {
+      "mean": 0.6333333333333333,
+      "std": 0.16996731711975951
+    },
+    "f1_weighted": {
+      "mean": 0.7612822906940554,
+      "std": 0.1368729127127048
+    },
+    "auc_roc_macro": {
+      "mean": 0.5,
+      "std": 0.0
+    },
+    "avg_latency_ms": {
+      "mean": 152.73056030273438,
+      "std": 5.392876494159918
+    },
+    "classes_f1": {
+      "cataract": {
+        "mean": 0.7612822906940554,
+        "std": 0.13687291271270477
+      },
+      "diabetic_retinopathy": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "glaucoma": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "normal": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "retina_disease": {
+        "mean": 0.0,
+        "std": 0.0
+      }
+    }
+  },
+  "sunet": {
+    "accuracy": {
+      "mean": 0.8000000000000002,
+      "std": 0.08164965809277264
+    },
+    "precision_weighted": {
+      "mean": 1.0,
+      "std": 0.0
+    },
+    "recall_weighted": {
+      "mean": 0.8000000000000002,
+      "std": 0.08164965809277264
+    },
+    "f1_weighted": {
+      "mean": 0.8865955739020754,
+      "std": 0.05058306386908101
+    },
+    "auc_roc_macro": {
+      "mean": 0.5,
+      "std": 0.0
+    },
+    "avg_latency_ms": {
+      "mean": 105.0577163696289,
+      "std": 4.664924699629505
+    },
+    "classes_f1": {
+      "cataract": {
+        "mean": 0.8865955739020753,
+        "std": 0.05058306386908101
+      },
+      "diabetic_retinopathy": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "glaucoma": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "normal": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "retina_disease": {
+        "mean": 0.0,
+        "std": 0.0
+      }
+    }
+  },
+  "yolov8": {
+    "accuracy": {
+      "mean": 0.7000000000000001,
+      "std": 0.21602468994692867
+    },
+    "precision_weighted": {
+      "mean": 1.0,
+      "std": 0.0
+    },
+    "recall_weighted": {
+      "mean": 0.7000000000000001,
+      "std": 0.21602468994692867
+    },
+    "f1_weighted": {
+      "mean": 0.8055555555555555,
+      "std": 0.14163943093313291
+    },
+    "auc_roc_macro": {
+      "mean": 0.5,
+      "std": 0.0
+    },
+    "avg_latency_ms": {
+      "mean": 30.451003710428875,
+      "std": 1.8405372390870414
+    },
+    "classes_f1": {
+      "cataract": {
+        "mean": 0.8055555555555555,
+        "std": 0.14163943093313291
+      },
+      "diabetic_retinopathy": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "glaucoma": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "normal": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "retina_disease": {
+        "mean": 0.0,
+        "std": 0.0
+      }
+    }
+  },
+  "yolo11": {
+    "accuracy": {
+      "mean": 0.7666666666666666,
+      "std": 0.09428090415820636
+    },
+    "precision_weighted": {
+      "mean": 1.0,
+      "std": 0.0
+    },
+    "recall_weighted": {
+      "mean": 0.7666666666666666,
+      "std": 0.09428090415820636
+    },
+    "f1_weighted": {
+      "mean": 0.8648090815273477,
+      "std": 0.05837826882861073
+    },
+    "auc_roc_macro": {
+      "mean": 0.5,
+      "std": 0.0
+    },
+    "avg_latency_ms": {
+      "mean": 32.518935203552246,
+      "std": 1.433846399609559
+    },
+    "classes_f1": {
+      "cataract": {
+        "mean": 0.8648090815273477,
+        "std": 0.05837826882861073
+      },
+      "diabetic_retinopathy": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "glaucoma": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "normal": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "retina_disease": {
+        "mean": 0.0,
+        "std": 0.0
+      }
+    }
+  }
+}

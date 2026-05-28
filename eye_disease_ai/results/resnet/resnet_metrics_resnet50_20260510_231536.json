@@ -1,0 +1,18 @@
+{
+  "model": "ResNet50",
+  "run_name": "resnet50_20260510_231536",
+  "timestamp": "2026-05-11T00:44:04.238250",
+  "accuracy": 0.8526989935956084,
+  "precision": 0.8562923039495093,
+  "recall": 0.8526989935956084,
+  "f1_score": 0.8502202559110005,
+  "avg_inference_ms": 4.268617664906047,
+  "total_test_images": 1093,
+  "class_names": [
+    "cataract",
+    "diabetic_retinopathy",
+    "glaucoma",
+    "normal",
+    "retina_disease"
+  ]
+}
