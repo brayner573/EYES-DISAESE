@@ -1,43 +1,43 @@
 {
   "model": "ResNet50",
   "seed": 2024,
-  "accuracy": 0.8,
-  "precision_weighted": 1.0,
-  "recall_weighted": 0.8,
-  "f1_weighted": 0.888888888888889,
-  "auc_roc_macro": 0.5,
-  "avg_latency_ms": 67.63863563537598,
-  "total_test_images": 10,
+  "accuracy": 0.6833205226748655,
+  "precision_weighted": 0.7546697514397186,
+  "recall_weighted": 0.6833205226748655,
+  "f1_weighted": 0.7060600855377249,
+  "auc_roc_macro": 0.9134691649050586,
+  "avg_latency_ms": 61.957671952009385,
+  "total_test_images": 1301,
   "classes": {
     "cataract": {
-      "precision": 1.0,
-      "recall": 0.8,
-      "f1_score": 0.8888888888888888,
-      "support": 10
+      "precision": 0.8809523809523809,
+      "recall": 0.736318407960199,
+      "f1_score": 0.8021680216802168,
+      "support": 201
     },
     "diabetic_retinopathy": {
-      "precision": 0.0,
-      "recall": 0.0,
-      "f1_score": 0.0,
-      "support": 0
+      "precision": 0.8233333333333334,
+      "recall": 0.7428571428571429,
+      "f1_score": 0.7810276679841898,
+      "support": 665
     },
     "glaucoma": {
-      "precision": 0.0,
-      "recall": 0.0,
-      "f1_score": 0.0,
-      "support": 0
+      "precision": 0.8099173553719008,
+      "recall": 0.5077720207253886,
+      "f1_score": 0.6242038216560509,
+      "support": 193
     },
     "normal": {
-      "precision": 0.0,
-      "recall": 0.0,
-      "f1_score": 0.0,
-      "support": 0
+      "precision": 0.43506493506493504,
+      "recall": 0.5903083700440529,
+      "f1_score": 0.5009345794392523,
+      "support": 227
     },
     "retina_disease": {
-      "precision": 0.0,
-      "recall": 0.0,
-      "f1_score": 0.0,
-      "support": 0
+      "precision": 0.14423076923076922,
+      "recall": 1.0,
+      "f1_score": 0.25210084033613445,
+      "support": 15
     }
   }
 }

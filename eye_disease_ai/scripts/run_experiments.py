@@ -105,37 +105,29 @@ def set_global_seed(seed):
 # --- 5-View Geometric TTA Logic (Step 5) ---
 def get_pytorch_tta_probs(model, inputs):
     """
-    Applies 5 geometric views to PyTorch inputs batch and averages softmax probabilities.
+    Applies 5 geometric views to PyTorch inputs batch and averages softmax probabilities in a single stacked forward pass.
     inputs shape: (1, 3, 224, 224)
     """
     # 1. Original View
-    out1 = model(inputs)
-    probs1 = F.softmax(out1, dim=1)
-    
     # 2. Horizontal Flip View
     inputs_h = torch.flip(inputs, dims=[3])
-    out2 = model(inputs_h)
-    probs2 = F.softmax(out2, dim=1)
-    
     # 3. Vertical Flip View
     inputs_v = torch.flip(inputs, dims=[2])
-    out3 = model(inputs_v)
-    probs3 = F.softmax(out3, dim=1)
-    
     # 4. Rotation +10 Degrees View
     inputs_r = F_t.rotate(inputs, 10)
-    out4 = model(inputs_r)
-    probs4 = F.softmax(out4, dim=1)
-    
-    # 5. Central Crop Scale 0.9 View (224 * 0.9 = 201)
+    # 5. Central Crop Scale 0.9 View
     h_crop = int(inputs.shape[2] * 0.9)
     inputs_c = F_t.center_crop(inputs, [h_crop, h_crop])
     inputs_c = F_t.resize(inputs_c, [inputs.shape[2], inputs.shape[3]])
-    out5 = model(inputs_c)
-    probs5 = F.softmax(out5, dim=1)
     
-    # Average vectors
-    avg_probs = (probs1 + probs2 + probs3 + probs4 + probs5) / 5.0
+    # Stack into a batch of size 5
+    batch = torch.cat([inputs, inputs_h, inputs_v, inputs_r, inputs_c], dim=0) # shape (5, 3, 224, 224)
+    
+    out = model(batch) # shape (5, num_classes)
+    probs = F.softmax(out, dim=1)
+    
+    # Average along the batch dimension
+    avg_probs = torch.mean(probs, dim=0, keepdim=True) # shape (1, num_classes)
     return avg_probs
 
 def get_yolo_tta_probs(model, img_path):
@@ -291,6 +283,13 @@ def run_evaluation(model_key, model_cfg, seed, fast_mode):
     results_dir = RESULT_DIR / model_cfg["save_dir"]
     results_dir.mkdir(parents=True, exist_ok=True)
     
+    json_path = results_dir / f"metricas_seed{seed}.json"
+    csv_path = results_dir / f"probs_seed{seed}.csv"
+    cm_path = results_dir / f"confusion_matrix_seed{seed}.png"
+    if json_path.exists() and csv_path.exists() and cm_path.exists():
+        print(f"    [OK] [Evaluacion] Los resultados para {model_cfg['name']} (Seed {seed}) ya existen. Omitiendo evaluacion.")
+        return True
+
     if not checkpoint_file.exists():
         print(f"  [ERROR] Checkpoint no encontrado: {checkpoint_file}")
         return False
@@ -322,16 +321,16 @@ def run_evaluation(model_key, model_cfg, seed, fast_mode):
         from ultralytics import YOLO
         model = YOLO(checkpoint_file)
 
-    # --- Paso 4: Latencia - Warmup de 1000 iteraciones (BS = 1) ---
-    print("    [WARMUP] Iniciando warmup de 1000 iteraciones...")
+    # --- Paso 4: Latencia - Warmup de 20 iteraciones (BS = 1) ---
+    print("    [WARMUP] Iniciando warmup de 20 iteraciones...")
     if is_pytorch:
         dummy_tensor = torch.randn(1, 3, IMG_SIZE, IMG_SIZE).to(DEVICE)
         with torch.no_grad():
-            for _ in range(1000):
+            for _ in range(20):
                 _ = get_pytorch_tta_probs(model, dummy_tensor)
     else:
         dummy_img = Image.fromarray(np.uint8(np.random.rand(IMG_SIZE, IMG_SIZE, 3) * 255))
-        for _ in range(1000):
+        for _ in range(20):
             _ = get_yolo_tta_probs(model, dummy_img)
 
     # --- Medición de tiempo real e Inferencia con TTA (Pasos 2, 4 y 5) ---

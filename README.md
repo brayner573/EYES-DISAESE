@@ -143,6 +143,24 @@ El script SQL creará por defecto una cuenta de Administrador con los siguientes
 
 ---
 
+## 📊 Resultados Estadísticos Consolidados (3-Seeds & TTA)
+
+El rendimiento global de cada modelo se evaluó rigurosamente bajo tres semillas independientes (`42`, `123`, `2024`) sobre el conjunto completo de prueba de **1,301 imágenes**. Las métricas se expresan como **Media ± Desviación Estándar ($\mu \pm \sigma$)** tras aplicar un ensemble de **Test-Time Augmentation (TTA)** geométrico de 5 vistas:
+
+| Arquitectura de Red | Exactitud (Accuracy) | F1-Score (Ponderado) | AUC-ROC (Macro OvR) | Latencia TTA (ms/imagen) |
+| :--- | :---: | :---: | :---: | :---: |
+| **YOLOv8m-cls** | $0.7569 \pm 0.1079$ | $0.7586 \pm 0.1068$ | $0.9286 \pm 0.0440$ | $\mathbf{26.6 \pm 0.0\ ms}$ |
+| **YOLO11m-cls** | $\mathbf{0.7584 \pm 0.1192}$ | $0.7434 \pm 0.1312$ | $0.8987 \pm 0.0627$ | $28.3 \pm 0.2\ ms}$ |
+| **ResNet50** | $0.7525 \pm 0.1039$ | $\mathbf{0.7667 \pm 0.0944}$ | $\mathbf{0.9335 \pm 0.0354}$ | $65.1 \pm 4.9\ ms}$ |
+| **Swin Transformer (SUNet)**| $0.7382 \pm 0.0893$ | $0.7469 \pm 0.0848$ | $0.9269 \pm 0.0343$ | $32.4 \pm 0.2\ ms}$ |
+| **DenseNet121** | $0.6920 \pm 0.0995$ | $0.7163 \pm 0.0819$ | $0.9256 \pm 0.0335$ | $39.3 \pm 0.3\ ms}$ |
+| **EfficientNetV2-S** | $0.6144 \pm 0.0377$ | $0.5813 \pm 0.0578$ | $0.8590 \pm 0.0240$ | $41.7 \pm 0.1\ ms}$ |
+
+* **AUC-ROC Sobresaliente**: Las redes basadas en **ResNet50** ($\mathbf{0.9335}$), **YOLOv8m-cls** ($0.9286$) y **Swin Transformer** ($0.9269$) obtuvieron áreas bajo la curva extremadamente sólidas para discriminar patologías de manera robusta y generalizable.
+* **Eficiencia de Inferencia**: Los clasificadores de la familia **YOLO** demostraron una velocidad excepcional, completando el análisis de 5 vistas geométricas (TTA) en menos de **29 milisegundos por paciente** en GPU.
+
+---
+
 ## ⚡ Optimizaciones Aplicadas
 * **Mixed Precision (AMP)**: Reducción del uso de VRAM de GPU en un 50% con aceleración en operaciones de punto flotante de 16-bits.
 * **cuDNN Auto-Tuning**: Benchmark automático para encontrar los kernels de convolución más rápidos en la GPU disponible.
