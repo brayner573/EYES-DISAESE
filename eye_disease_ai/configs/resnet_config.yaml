@@ -1,0 +1,58 @@
+# ─────────────────────────────────────────────────────────────
+# ResNet50 Transfer Learning Config — Eye Disease AI
+# ─────────────────────────────────────────────────────────────
+
+# Modelo
+architecture: resnet50
+pretrained: ImageNet1K_V2
+
+# Dataset
+data_dir: dataset_split
+img_size: 224
+
+# Fase 1 — Solo cabeza de clasificación (backbone congelado)
+phase1:
+  epochs: 15
+  lr: 0.001
+  scheduler: CosineAnnealingLR
+  patience: 10
+
+# Fase 2 — Fine-tuning completo
+phase2:
+  epochs: 30
+  lr: 0.0001
+  weight_decay: 0.0001
+  scheduler: CosineAnnealingLR
+  patience: 10
+
+# Cabeza de clasificación
+classifier:
+  dropout_1: 0.4
+  hidden_1: 512
+  dropout_2: 0.3
+  hidden_2: 256
+  dropout_3: 0.2
+
+# Data Augmentation
+augmentation:
+  random_crop: true
+  horizontal_flip: 0.5
+  vertical_flip: 0.2
+  color_jitter:
+    brightness: 0.3
+    contrast: 0.3
+    saturation: 0.2
+    hue: 0.05
+  rotation: 20
+  gaussian_blur: true
+  random_erasing: 0.1
+
+# Hardware
+device: auto                 # auto, cuda, cpu
+amp: true                    # Mixed precision
+batch_size: auto             # auto = según VRAM
+num_workers: auto            # auto = según OS y VRAM
+pin_memory: true
+cudnn_benchmark: true
+gradient_clipping: 1.0
+seed: 42

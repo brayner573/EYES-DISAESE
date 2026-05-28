@@ -1,0 +1,57 @@
+# ─── Python & Virtual Environments ──────────────────────────────────────────
+venv/
+.venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+dist/
+build/
+*.so
+
+# ─── IDE & OS ──────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ─── Dataset (heavy files/folders) ─────────────────────────────────────────
+eye_disease_ai/raw_data/
+eye_disease_ai/dataset_split/
+raw_data/
+dataset_split/
+
+# ─── Pretrained & Trained Models (heavy weights) ───────────────────────────
+*.pt
+*.pth
+eye_disease_ai/*.pt
+eye_disease_ai/models/**/*.pt
+eye_disease_ai/models/**/*.pth
+eye_disease_ai/models/**/weights/
+*.onnx
+*.engine
+
+# ─── Results & Logs ────────────────────────────────────────────────────────
+eye_disease_ai/results/
+eye_disease_ai/logs/
+eye_disease_ai/runs/
+results/
+logs/
+runs/
+*.log
+
+# ─── Web & Node ────────────────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# ─── Others ────────────────────────────────────────────────────────────────
+*.tmp
+*.bak

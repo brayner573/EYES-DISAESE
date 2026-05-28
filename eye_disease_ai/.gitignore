@@ -1,0 +1,56 @@
+# ─── Python ───────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+dist/
+build/
+*.so
+
+# ─── Entorno Virtual ──────────────────────────────────────────
+venv/
+.venv/
+env/
+
+# ─── IDE ──────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ─── Dataset (imágenes pesadas) ───────────────────────────────
+raw_data/**/
+!raw_data/**/
+raw_data/**/*.jpg
+raw_data/**/*.jpeg
+raw_data/**/*.png
+raw_data/**/*.bmp
+raw_data/**/*.webp
+dataset_split/
+
+# ─── Modelos entrenados (pesados) ─────────────────────────────
+models/**/*.pt
+models/**/*.pth
+models/**/weights/
+*.onnx
+*.engine
+
+# ─── Resultados (generados) ──────────────────────────────────
+results/
+logs/
+
+# ─── Jupyter ──────────────────────────────────────────────────
+.ipynb_checkpoints/
+notebooks/*.html
+
+# ─── Runs de Ultralytics ─────────────────────────────────────
+runs/
+
+# ─── Otros ────────────────────────────────────────────────────
+*.log
+*.tmp
+*.bak

@@ -1,0 +1,43 @@
+# ─────────────────────────────────────────────────────────────
+# YOLOv8 Classification Config — Eye Disease AI
+# ─────────────────────────────────────────────────────────────
+
+# Modelo
+model: yolov8n-cls.pt        # yolov8n-cls.pt (nano) o yolov8s-cls.pt (small)
+
+# Dataset
+data: dataset_split           # Ruta relativa al dataset
+
+# Entrenamiento
+epochs: 100
+imgsz: 224
+batch: -1                     # -1 = auto-batch según VRAM
+patience: 20                  # Early stopping
+
+# Optimizador
+optimizer: AdamW
+lr0: 0.001
+lrf: 0.01
+weight_decay: 0.0005
+warmup_epochs: 5
+
+# Augmentation
+augment: true
+hsv_h: 0.015
+hsv_s: 0.4
+hsv_v: 0.3
+flipud: 0.2
+fliplr: 0.5
+degrees: 15.0
+translate: 0.1
+scale: 0.3
+erasing: 0.1
+mixup: 0.1
+
+# Hardware
+device: 0                    # 0 = primera GPU, cpu = CPU
+amp: true                    # Mixed precision
+workers: 4
+cos_lr: true                 # Cosine LR schedule
+seed: 42
+verbose: true
