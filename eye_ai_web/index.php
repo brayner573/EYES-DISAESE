@@ -21,6 +21,7 @@ require_once __DIR__ . '/controllers/AuthController.php';
 require_once __DIR__ . '/controllers/UserController.php';
 require_once __DIR__ . '/controllers/AdminController.php';
 require_once __DIR__ . '/controllers/PredictionController.php';
+require_once __DIR__ . '/controllers/ApiController.php';
 
 // ─── Cargar rutas y resolver ─────────────────────────────────
 require_once __DIR__ . '/routes/web.php';

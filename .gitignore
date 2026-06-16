@@ -50,6 +50,16 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+# ─── Web Uploads (user data, never commit) ──────────────────────────────────
+eye_ai_web/assets/uploads/
+
+# ─── Local dev scripts ────────────────────────────────────────────────────────
+eye_ai_web/setup_db.php
+
+# ─── YOLO training runs (heavy output folders) ────────────────────────────────
+eye_disease_ai/models/yolo/yolov8*_eye_cls_*/
+eye_disease_ai/models/yolo11/yolo11*_eye_cls_*/
+
 # ─── Others ────────────────────────────────────────────────────────────────
 *.tmp
 *.bak

@@ -43,12 +43,13 @@ require VIEWS_PATH . '/layouts/header.php';
                         <th>Confianza</th>
                         <th>Modelo</th>
                         <th>Fecha</th>
+                        <th class="pe-4 text-end">Acción</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (empty($data['recent'])): ?>
                     <tr>
-                        <td colspan="5" class="text-center py-4 text-muted">
+                        <td colspan="6" class="text-center py-4 text-muted">
                             <i class="bi bi-inbox fs-2 d-block mb-2"></i>
                             Aún no has realizado ningún análisis.
                         </td>
@@ -75,6 +76,11 @@ require VIEWS_PATH . '/layouts/header.php';
                             </td>
                             <td><span class="badge bg-light text-dark border"><?= sanitize($p['model_used']) ?></span></td>
                             <td class="text-muted small"><?= date('d M, Y H:i', strtotime($p['created_at'])) ?></td>
+                            <td class="pe-4 text-end">
+                                <a href="<?= BASE_URL ?>/prediction/view/<?= $p['id'] ?>" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                    <i class="bi bi-file-medical"></i> Ver
+                                </a>
+                            </td>
                         </tr>
                         <?php endforeach; ?>
                     <?php endif; ?>

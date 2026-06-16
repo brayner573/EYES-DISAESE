@@ -1,0 +1,19 @@
+YOLO11m Classification Report — yolo11m_eye_cls_20260602_130644
+=================================================================
+
+                      precision    recall  f1-score   support
+
+            cataract       0.95      0.92      0.93       201
+diabetic_retinopathy       0.89      0.96      0.92       399
+            glaucoma       0.89      0.85      0.87       193
+              normal       0.85      0.80      0.82       227
+      retina_disease       0.81      0.87      0.84        15
+
+            accuracy                           0.89      1035
+           macro avg       0.88      0.88      0.88      1035
+        weighted avg       0.89      0.89      0.89      1035
+
+Accuracy  : 0.8928
+Precision : 0.8926
+Recall    : 0.8928
+F1-score  : 0.8919

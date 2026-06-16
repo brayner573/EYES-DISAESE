@@ -1,0 +1,18 @@
+{
+  "model": "DenseNet121",
+  "run_name": "densenet121_20260603_080356",
+  "timestamp": "2026-06-03T12:03:56.336074",
+  "accuracy": 0.765564950038432,
+  "precision": 0.7873939988382059,
+  "recall": 0.765564950038432,
+  "f1_score": 0.765677452316377,
+  "avg_inference_ms": 7.2550306312860116,
+  "total_test_images": 1301,
+  "class_names": [
+    "cataract",
+    "diabetic_retinopathy",
+    "glaucoma",
+    "normal",
+    "retina_disease"
+  ]
+}

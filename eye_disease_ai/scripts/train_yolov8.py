@@ -75,8 +75,7 @@ def get_gpu_info():
             info["recommended_workers"] = 2
 
         if os.name == "nt":
-            info["recommended_workers"] = min(info["recommended_workers"], 4)
-
+            info["recommended_workers"] = 0
     return info
 
 
@@ -163,13 +162,15 @@ def train_yolo(args, gpu_info: dict):
         exist_ok=True,
         pretrained=True,
         device=device,
-        optimizer="AdamW",  # Forzamos AdamW — estable y superior para clasificación médica
-        lr0=0.001,
+        optimizer="AdamW",
+        lr0=0.0005,        # Reducido de 0.001 para estabilizar el fine-tuning
         lrf=0.01,
         weight_decay=5e-4,
         warmup_epochs=5,
+        label_smoothing=0.1, # Evita sobreconfianza sistemática (antes omitido en YOLO)
+        deterministic=True,  # Fuerza determinismo para reproducibilidad entre ejecuciones
         
-        # Data Augmentation muy agresivo
+        # Data Augmentation optimizado para desbalance severo
         augment=True,
         hsv_h=0.015,
         hsv_s=0.5,
@@ -179,10 +180,10 @@ def train_yolo(args, gpu_info: dict):
         degrees=25.0,
         translate=0.2,
         scale=0.4,
-        erasing=0.2,       # Ayuda a que la red no memorice artefactos del oftalmoscopio
-        mixup=0.2,         # Vital para clases minoritarias
-        auto_augment="randaugment", # Usa políticas óptimas de augmentación
-
+        erasing=0.2,       
+        mixup=0.05,        # Reducido de 0.2 para evitar difuminar la clase minoritaria (Desprendimiento)
+        auto_augment="randaugment", 
+ 
         verbose=True,
         seed=args.seed,
         cos_lr=True,

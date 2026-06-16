@@ -4,10 +4,36 @@
  * Funciones helper para autenticación y control de acceso
  */
 
+// Asegurar existencia de getallheaders() para entornos PHP-CGI/FPM
+if (!function_exists('getallheaders')) {
+    function getallheaders() {
+        $headers = [];
+        foreach ($_SERVER as $name => $value) {
+            if (substr($name, 0, 5) == 'HTTP_') {
+                $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+            }
+        }
+        return $headers;
+    }
+}
+
 // Iniciar sesión con configuración segura
 function initSession() {
     if (session_status() === PHP_SESSION_NONE) {
-        ini_set('session.use_only_cookies', 1);
+        // Permitir autenticación de API vía cabecera Authorization: Bearer <session_id>
+        $headers = getallheaders();
+        $authHeader = $headers['Authorization'] ?? $headers['authorization'] ?? '';
+        $isApi = false;
+
+        if (preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
+            $sessionId = $matches[1];
+            session_id($sessionId);
+            $isApi = true;
+        }
+
+        if (!$isApi) {
+            ini_set('session.use_only_cookies', 1);
+        }
         ini_set('session.use_strict_mode', 1);
         ini_set('session.cookie_httponly', 1);
         ini_set('session.cookie_samesite', 'Lax');
@@ -16,12 +42,14 @@ function initSession() {
         session_name('EYE_AI_SESSION');
         session_start();
 
-        // Regenerar ID cada 30 min para evitar session fixation
-        if (!isset($_SESSION['_last_regeneration'])) {
-            $_SESSION['_last_regeneration'] = time();
-        } elseif (time() - $_SESSION['_last_regeneration'] > 1800) {
-            session_regenerate_id(true);
-            $_SESSION['_last_regeneration'] = time();
+        // Regenerar ID cada 30 min para evitar session fixation (solo para web normal)
+        if (!$isApi) {
+            if (!isset($_SESSION['_last_regeneration'])) {
+                $_SESSION['_last_regeneration'] = time();
+            } elseif (time() - $_SESSION['_last_regeneration'] > 1800) {
+                session_regenerate_id(true);
+                $_SESSION['_last_regeneration'] = time();
+            }
         }
     }
 }

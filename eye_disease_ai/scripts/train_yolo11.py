@@ -76,8 +76,7 @@ def get_gpu_info():
             info["recommended_workers"] = 2
 
         if os.name == "nt":
-            info["recommended_workers"] = min(info["recommended_workers"], 4)
-
+            info["recommended_workers"] = 0
     return info
 
 
@@ -165,12 +164,14 @@ def train_yolo11(args, gpu_info: dict):
         pretrained=True,
         device=device,
         optimizer="AdamW",
-        lr0=0.001,
+        lr0=0.0005,        # Reducido de 0.001 para estabilizar el fine-tuning
         lrf=0.01,
         weight_decay=5e-4,
         warmup_epochs=5,
+        label_smoothing=0.1, # Evita sobreconfianza sistemática (antes omitido en YOLO)
+        deterministic=True,  # Fuerza determinismo para reproducibilidad entre ejecuciones
         
-        # Data Augmentation muy agresivo
+        # Data Augmentation optimizado para desbalance severo
         augment=True,
         hsv_h=0.015,
         hsv_s=0.5,
@@ -181,7 +182,7 @@ def train_yolo11(args, gpu_info: dict):
         translate=0.2,
         scale=0.4,
         erasing=0.2,       
-        mixup=0.2,         
+        mixup=0.05,        # Reducido de 0.2 para evitar difuminar la clase minoritaria (Desprendimiento)
         auto_augment="randaugment", 
 
         verbose=True,

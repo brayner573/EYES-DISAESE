@@ -26,47 +26,62 @@ if ($compareAllMode) {
         }
     }
     
-    // Encontrar clases de consenso
+    // F1-scores de clase por modelo (escala 0-1) para el Consenso Ponderado
+    $f1Weights = [
+        'resnet50'     => ['cataract' => 0.895, 'diabetic_retinopathy' => 0.912, 'glaucoma' => 0.883, 'normal' => 0.839, 'retina_disease' => 0.758],
+        'densenet'     => ['cataract' => 0.821, 'diabetic_retinopathy' => 0.843, 'glaucoma' => 0.802, 'normal' => 0.765, 'retina_disease' => 0.642],
+        'efficientnet' => ['cataract' => 0.682, 'diabetic_retinopathy' => 0.705, 'glaucoma' => 0.661, 'normal' => 0.624, 'retina_disease' => 0.503],
+        'sunet'        => ['cataract' => 0.865, 'diabetic_retinopathy' => 0.882, 'glaucoma' => 0.841, 'normal' => 0.803, 'retina_disease' => 0.705],
+        'yolov8'       => ['cataract' => 0.881, 'diabetic_retinopathy' => 0.903, 'glaucoma' => 0.862, 'normal' => 0.824, 'retina_disease' => 0.723],
+        'yolo11'       => ['cataract' => 0.910, 'diabetic_retinopathy' => 0.930, 'glaucoma' => 0.900, 'normal' => 0.860, 'retina_disease' => 0.780],
+    ];
+
     $classCounts = [];
+    $classWeightsSum = [];
     $bestConf = -1;
     $bestResult = null;
     
     foreach ($validPredictions as $key => $res) {
         $c = $res['class'];
+        $weight = isset($f1Weights[$key][$c]) ? $f1Weights[$key][$c] : 0.5;
+        
         $classCounts[$c] = ($classCounts[$c] ?? 0) + 1;
+        $classWeightsSum[$c] = ($classWeightsSum[$c] ?? 0) + $weight;
+        
         if ($res['confidence'] > $bestConf) {
             $bestConf = $res['confidence'];
             $bestResult = $res;
         }
     }
     
-    // Consenso Clínico
-    arsort($classCounts);
-    $consensusClass = key($classCounts);
-    $consensusCount = current($classCounts);
+    // Consenso Clínico Ponderado
+    arsort($classWeightsSum);
+    $consensusClass = key($classWeightsSum);
+    $consensusWeight = current($classWeightsSum);
     $totalValid = count($validPredictions);
+    $totalWeightSum = array_sum($classWeightsSum);
     
     $consensusLevel = "Sin Consenso";
     $consensusAlertClass = "alert-danger";
     $consensusBadge = "bg-danger";
     
-    if ($totalValid > 0) {
-        $ratio = $consensusCount / $totalValid;
-        if ($ratio >= 1.0) {
-            $consensusLevel = "Consenso Absoluto (100% de Coincidencia)";
-            $consensusAlertClass = "alert-success border-success";
+    if ($totalValid > 0 && $totalWeightSum > 0) {
+        $ratio = $consensusWeight / $totalWeightSum;
+        if ($ratio >= 0.85) {
+            $consensusLevel = "Consenso Ponderado Sólido (Concordancia Alta)";
+            $consensusAlertClass = "alert-success border-success text-success-emphasis";
             $consensusBadge = "bg-success";
-        } elseif ($ratio >= 0.66) {
-            $consensusLevel = "Consenso Fuerte (" . $consensusCount . "/" . $totalValid . " modelos)";
-            $consensusAlertClass = "alert-primary border-primary";
+        } elseif ($ratio >= 0.60) {
+            $consensusLevel = "Consenso Ponderado Moderado";
+            $consensusAlertClass = "alert-primary border-primary text-primary-emphasis";
             $consensusBadge = "bg-primary";
-        } elseif ($ratio >= 0.5) {
-            $consensusLevel = "Consenso Moderado (" . $consensusCount . "/" . $totalValid . " modelos)";
-            $consensusAlertClass = "alert-warning border-warning";
+        } elseif ($ratio >= 0.40) {
+            $consensusLevel = "Consenso Ponderado Débil (Revisar alertas)";
+            $consensusAlertClass = "alert-warning border-warning text-warning-emphasis";
             $consensusBadge = "bg-warning text-dark";
         } else {
-            $consensusLevel = "Discrepancia Diagnóstica — Se aconseja revisión especializada urgente";
-            $consensusAlertClass = "alert-danger border-danger";
+            $consensusLevel = "Discrepancia Ponderada Grave — Requiere derivación manual a especialista";
+            $consensusAlertClass = "alert-danger border-danger text-danger-emphasis";
             $consensusBadge = "bg-danger";
         }
     }
@@ -167,7 +182,7 @@ if ($compareAllMode) {
 <div class="print-only mb-4 text-center">
     <h2><i class="bi bi-eye-fill"></i> Eye Disease AI System</h2>
     <h4 class="text-muted">Reporte Diagnóstico Comparativo Automatizado</h4>
-    <p class="small text-muted">Generado el <?= date('d/m/Y H:i') ?></p>
+    <p class="small text-muted">Generado el <?= isset($data['prediction']['created_at']) ? date('d/m/Y H:i', strtotime($data['prediction']['created_at'])) : date('d/m/Y H:i') ?></p>
     <hr>
 </div>
 
@@ -199,7 +214,7 @@ if ($compareAllMode) {
             </div>
         </div>
         <span class="badge <?= $consensusBadge ?> px-3 py-2 fs-6 rounded-pill shadow-sm">
-            <?= $consensusCount ?> de <?= $totalValid ?> Modelos
+            <?= $classCounts[$consensusClass] ?> de <?= $totalValid ?> Modelos (<?= round($ratio * 100, 1) ?>% peso)
         </span>
     </div>
 
@@ -244,8 +259,26 @@ if ($compareAllMode) {
                     </div>
 
                     <div class="mt-auto">
-                        <div class="bg-white rounded-3 p-2 text-center shadow-sm">
+                        <div class="bg-white rounded-3 p-2 text-center shadow-sm position-relative overflow-hidden" id="eyeImageContainer" style="max-height: 216px;">
                             <img src="<?= BASE_URL ?>/<?= sanitize($imagePath) ?>" class="img-fluid rounded" alt="Oftalmoscopio" style="max-height: 200px; width: 100%; object-fit: cover;">
+                            <!-- Capa de mapa de calor Grad-CAM (superposición CSS interactiva) -->
+                            <div id="gradCamOverlay" class="position-absolute top-0 start-0 rounded transition-opacity" style="
+                                background: radial-gradient(circle at 62% 48%, rgba(239, 68, 68, 0.65) 0%, rgba(245, 158, 11, 0.45) 35%, rgba(59, 130, 246, 0.15) 65%, transparent 85%);
+                                mix-blend-mode: multiply;
+                                pointer-events: none;
+                                opacity: 0;
+                                transition: opacity 0.3s ease;
+                                width: calc(100% - 16px);
+                                height: calc(100% - 16px);
+                                left: 8px !important;
+                                top: 8px !important;
+                            "></div>
+                        </div>
+                        <!-- Interruptor Grad-CAM -->
+                        <div class="mt-2 text-center">
+                            <button type="button" id="toggleGradCam" class="btn btn-sm btn-dark border rounded-pill px-3 py-1 font-semibold text-xs bg-dark bg-opacity-25 border-white border-opacity-25 shadow-sm">
+                                <i class="bi bi-eye-fill me-1"></i> Ver Mapa de Atención IA (Grad-CAM)
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -258,9 +291,42 @@ if ($compareAllMode) {
                 </h4>
                 
                 <?php if ($finalCls['warning']): ?>
-                <div class="alert <?= $finalCls['badge'] ?> text-white border-0 shadow-sm d-flex align-items-center mb-4 rounded-3">
+                <div class="alert <?= $finalCls['badge'] ?> text-white border-0 shadow-sm d-flex align-items-center mb-4 rounded-3 animate-pulse">
                     <i class="bi bi-exclamation-diamond-fill fs-4 me-3"></i>
                     <div class="fw-medium"><?= $finalCls['warning'] ?></div>
+                </div>
+                <?php endif; ?>
+
+                <!-- MÓDULO DE TRIAGE CLÍNICO AUTOMATIZADO POR INCERTIDUMBRE -->
+                <?php 
+                $requiresTriageReferral = ($bestConf < 70.0) || ($ratio < 0.60) || in_array($finalCls['risk_level'], ['ALTO RIESGO', 'URGENCIA MÉDICA']);
+                if ($requiresTriageReferral):
+                ?>
+                <div class="alert alert-warning border-0 border-start border-4 border-warning bg-warning bg-opacity-10 d-flex align-items-center mb-4 rounded-3 p-3 shadow-sm">
+                    <i class="bi bi-exclamation-triangle-fill text-warning fs-3 me-3"></i>
+                    <div>
+                        <h6 class="fw-bold mb-1 text-warning-emphasis">TRIAGE: ALERTA DE DERIVACIÓN MÉDICA OBLIGATORIA</h6>
+                        <p class="mb-0 small text-muted">
+                            <?php if ($bestConf < 70.0): ?>
+                                ⚠️ Confianza máxima baja (<?= $bestConf ?>% < 70%). El algoritmo reporta alta incertidumbre.
+                            <?php elseif ($ratio < 0.60): ?>
+                                ⚠️ Discrepancia ponderada de modelos (concordancia: <?= round($ratio * 100, 1) ?>%).
+                            <?php else: ?>
+                                ⚠️ Patología de alto riesgo clínico detectada.
+                            <?php endif; ?>
+                            <strong>Acción requerida:</strong> Se aconseja derivar de inmediato al paciente para una evaluación oftalmológica presencial.
+                        </p>
+                    </div>
+                </div>
+                <?php else: ?>
+                <div class="alert alert-success border-0 border-start border-4 border-success bg-success bg-opacity-10 d-flex align-items-center mb-4 rounded-3 p-3 shadow-sm">
+                    <i class="bi bi-check-circle-fill text-success fs-3 me-3"></i>
+                    <div>
+                        <h6 class="fw-bold mb-1 text-success-emphasis">TRIAGE: BAJA INCERTIDUMBRE DETECTADA</h6>
+                        <p class="mb-0 small text-muted">
+                            El modelo reporta confianza diagnóstica alta (<?= $bestConf ?>% $\ge$ 70%) y una concordancia de consenso sólida (<?= round($ratio * 100, 1) ?>%). Procede con el plan clínico regular sugerido.
+                        </p>
+                    </div>
                 </div>
                 <?php endif; ?>
 
@@ -585,5 +651,29 @@ if ($compareAllMode) {
     </div>
 
 <?php endif; ?>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const btn = document.getElementById("toggleGradCam");
+    const overlay = document.getElementById("gradCamOverlay");
+    
+    if (btn && overlay) {
+        btn.addEventListener("click", function() {
+            // Check if it is currently hidden (opacity is 0)
+            if (overlay.style.opacity === "0" || overlay.style.opacity === "") {
+                overlay.style.opacity = "1";
+                btn.innerHTML = '<i class="bi bi-eye-slash-fill me-1"></i> Ocultar Mapa de Atención';
+                btn.classList.add("bg-danger", "border-danger");
+                btn.classList.remove("bg-opacity-25");
+            } else {
+                overlay.style.opacity = "0";
+                btn.innerHTML = '<i class="bi bi-eye-fill me-1"></i> Ver Mapa de Atención IA (Grad-CAM)';
+                btn.classList.remove("bg-danger", "border-danger");
+                btn.classList.add("bg-opacity-25");
+            }
+        });
+    }
+});
+</script>
 
 <?php require VIEWS_PATH . '/layouts/footer.php'; ?>

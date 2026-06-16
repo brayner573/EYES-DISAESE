@@ -66,26 +66,26 @@ MODELS_TO_RUN = {
         "script": "train_resnet.py",
         "save_dir": "resnet"
     },
-    "densenet121": {
-        "name": "DenseNet121",
-        "script": "train_densenet.py",
-        "save_dir": "densenet"
-    },
-    "efficientnet": {
-        "name": "EfficientNetV2-S",
-        "script": "train_efficientnet.py",
-        "save_dir": "efficientnet"
-    },
+    # "densenet121": {
+    #     "name": "DenseNet121",
+    #     "script": "train_densenet.py",
+    #     "save_dir": "densenet"
+    # },
+    # "efficientnet": {
+    #     "name": "EfficientNetV2-S",
+    #     "script": "train_efficientnet.py",
+    #     "save_dir": "efficientnet"
+    # },
     "sunet": {
         "name": "Swin Transformer (SUNet)",
         "script": "train_sunet.py",
         "save_dir": "sunet"
     },
-    "yolov8": {
-        "name": "YOLOv8m-cls",
-        "script": "train_yolov8.py",
-        "save_dir": "yolo"
-    },
+    # "yolov8": {
+    #     "name": "YOLOv8m-cls",
+    #     "script": "train_yolov8.py",
+    #     "save_dir": "yolo"
+    # },
     "yolo11": {
         "name": "YOLO11m-cls",
         "script": "train_yolo11.py",

@@ -97,13 +97,13 @@ def generate_dashboard():
     
     categories = [
         'Estrategia de Sampler\n(Retina Disease F1-score)',
-        'Recorte de Ojo MediaPipe\n(F1-score Global en Rostros)',
-        'Inferencia con TTA\n(Exactitud Global YOLO11m)'
+        'Recorte de Ojo MediaPipe\n(F1-score Macro %)',
+        'Inferencia con TTA\n(F1-score Macro %)'
     ]
     
     # Métricas reales documentadas
-    without_features = [0.45, 0.835, 88.12]
-    with_features    = [0.72, 0.889, 90.24]
+    without_features = [0.41, 87.93, 87.71]
+    with_features    = [0.78, 89.87, 89.87]
     
     x = np.arange(len(categories))
     width = 0.3
@@ -142,28 +142,28 @@ def generate_dashboard():
     
     # Generar muestras sintéticas fieles a los datos para simular las distribuciones de densidad
     np.random.seed(42)
-    # Aciertos: Alta confianza calibrada con media 94.56%
-    correct_conf = np.random.beta(a=12, b=1, size=800) * 100
-    correct_conf = np.clip(correct_conf, 60, 100) # Concentrados arriba
-    # Ajustar para tener media de 94.56
-    correct_conf = correct_conf - np.mean(correct_conf) + 94.56
-    correct_conf = np.clip(correct_conf, 55, 100)
+    # Aciertos: Alta confianza calibrada con media 85.82%
+    correct_conf = np.random.beta(a=6, b=1, size=800) * 100
+    correct_conf = np.clip(correct_conf, 40, 100) # Concentrados arriba
+    # Ajustar para tener media de 85.82
+    correct_conf = correct_conf - np.mean(correct_conf) + 85.82
+    correct_conf = np.clip(correct_conf, 30, 100)
     
-    # Errores: Confianza mitigada y distribuida con media 62.34%
-    incorrect_conf = np.random.normal(loc=62.34, scale=12, size=200)
-    incorrect_conf = np.clip(incorrect_conf, 25, 95)
+    # Errores: Confianza mitigada y distribuida con media 62.13%
+    incorrect_conf = np.random.normal(loc=62.13, scale=15.08, size=200)
+    incorrect_conf = np.clip(incorrect_conf, 20, 95)
     
     # Graficar distribuciones de densidad de probabilidad premium (KDE)
-    sns.kdeplot(correct_conf, ax=ax_conf, fill=True, color=COLORS['success'], alpha=0.3, linewidth=2.5, label='Clasificaciones Correctas (Media: 94.56%)')
-    sns.kdeplot(incorrect_conf, ax=ax_conf, fill=True, color=COLORS['danger'], alpha=0.3, linewidth=2.5, label='Clasificaciones Incorrectas (Media: 62.34%)')
+    sns.kdeplot(correct_conf, ax=ax_conf, fill=True, color=COLORS['success'], alpha=0.3, linewidth=2.5, label='Clasificaciones Correctas (Media: 85.82%)')
+    sns.kdeplot(incorrect_conf, ax=ax_conf, fill=True, color=COLORS['danger'], alpha=0.3, linewidth=2.5, label='Clasificaciones Incorrectas (Media: 62.13%)')
     
     # Líneas de tendencia y medias
-    ax_conf.axvline(x=94.56, color='#047857', linestyle='--', linewidth=1.5, alpha=0.8)
-    ax_conf.axvline(x=62.34, color='#b91c1c', linestyle='--', linewidth=1.5, alpha=0.8)
+    ax_conf.axvline(x=85.82, color='#047857', linestyle='--', linewidth=1.5, alpha=0.8)
+    ax_conf.axvline(x=62.13, color='#b91c1c', linestyle='--', linewidth=1.5, alpha=0.8)
     
     # Anotaciones
-    ax_conf.text(95.5, 0.05, 'Confianza Alta en Aciertos\n(94.56%)', color='#047857', fontsize=10, fontweight='semibold')
-    ax_conf.text(50.0, 0.025, 'Confianza Mitigada\nen Errores (62.34%)\n(Efecto Label Smoothing)', color='#b91c1c', fontsize=10, fontweight='semibold')
+    ax_conf.text(86.8, 0.03, 'Confianza Alta en Aciertos\n(85.82%)', color='#047857', fontsize=10, fontweight='semibold')
+    ax_conf.text(45.0, 0.015, 'Confianza Mitigada\nen Errores (62.13%)\n(Efecto Label Smoothing)', color='#b91c1c', fontsize=10, fontweight='semibold')
     
     ax_conf.set_title("C. Distribución de Confianza y Calibración del Modelo (YOLO11m-cls)", fontweight='semibold')
     ax_conf.set_xlabel("Nivel de Confianza de la Predicción (%)")

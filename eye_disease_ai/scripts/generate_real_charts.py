@@ -49,32 +49,91 @@ MODEL_COLORS = {
 }
 
 # ─── Datos Experimentales Reales Registrados en results/ ────────────────────────
-MODELS_DATA = {
-    'ResNet50': {
-        'accuracy': 88.85, 'f1': 88.95, 'precision': 89.27, 'recall': 88.85, 'latency': 4.86,
-        'class_f1': {'Catarata': 0.92, 'Ret. Diabética': 0.95, 'Glaucoma': 0.83, 'Normal': 0.76, 'Retina Dis.': 0.72}
-    },
-    'DenseNet121': {
-        'accuracy': 81.48, 'f1': 81.41, 'precision': 81.79, 'recall': 81.48, 'latency': 10.42,
-        'class_f1': {'Catarata': 0.90, 'Ret. Diabética': 0.89, 'Glaucoma': 0.77, 'Normal': 0.57, 'Retina Dis.': 0.73}
-    },
-    'EfficientNetV2-S': {
-        'accuracy': 66.72, 'f1': 66.83, 'precision': 70.87, 'recall': 66.72, 'latency': 6.66,
-        'class_f1': {'Catarata': 0.79, 'Ret. Diabética': 0.76, 'Glaucoma': 0.58, 'Normal': 0.37, 'Retina Dis.': 0.64}
-    },
-    'Swin-T (SUNet)': {
-        'accuracy': 85.93, 'f1': 86.15, 'precision': 86.92, 'recall': 85.93, 'latency': 6.69,
-        'class_f1': {'Catarata': 0.90, 'Ret. Diabética': 0.92, 'Glaucoma': 0.80, 'Normal': 0.71, 'Retina Dis.': 0.58}
-    },
-    'YOLOv8m-cls': {
-        'accuracy': 88.02, 'f1': 88.03, 'precision': 88.14, 'recall': 88.02, 'latency': 36.44,
-        'class_f1': {'Catarata': 0.89, 'Ret. Diabética': 0.93, 'Glaucoma': 0.85, 'Normal': 0.82, 'Retina Dis.': 0.81}
-    },
-    'YOLO11m-cls': {
-        'accuracy': 90.24, 'f1': 90.22, 'precision': 90.54, 'recall': 90.24, 'latency': 37.71,
-        'class_f1': {'Catarata': 0.91, 'Ret. Diabética': 0.93, 'Glaucoma': 0.90, 'Normal': 0.86, 'Retina Dis.': 0.78}
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+RESULT_DIR   = PROJECT_ROOT / "results"
+RESULT_DIR.mkdir(parents=True, exist_ok=True)
+
+# Cargar datos consolidados dinámicamente si existen
+CONSOLIDATED_JSON = RESULT_DIR / "comparison_summary_consolidated.json"
+
+if CONSOLIDATED_JSON.exists():
+    print(f"Loading consolidated metrics from {CONSOLIDATED_JSON}...")
+    with open(CONSOLIDATED_JSON, "r", encoding="utf-8") as f:
+        raw_data = json.load(f)
+    
+    # Mapeo de claves
+    key_mapping = {
+        'resnet50': 'ResNet50',
+        'densenet121': 'DenseNet121',
+        'efficientnet': 'EfficientNetV2-S',
+        'sunet': 'Swin-T (SUNet)',
+        'yolov8': 'YOLOv8m-cls',
+        'yolo11': 'YOLO11m-cls'
     }
-}
+    
+    MODELS_DATA = {}
+    MODELS_ERRORS = {} # Para almacenar desviaciones estándar para barras de error
+    
+    for k, v in raw_data.items():
+        if k in key_mapping:
+            pres_name = key_mapping[k]
+            MODELS_DATA[pres_name] = {
+                'accuracy': v['accuracy']['mean'],
+                'f1': v['f1_weighted']['mean'],
+                'precision': v['precision_macro']['mean'],
+                'recall': v['recall_macro']['mean'],
+                'latency': v['avg_latency_ms']['mean'],
+                'class_f1': {
+                    'Catarata': v['classes_f1']['cataract']['mean'] / 100.0 if v['classes_f1']['cataract']['mean'] > 1.0 else v['classes_f1']['cataract']['mean'],
+                    'Ret. Diabética': v['classes_f1']['diabetic_retinopathy']['mean'] / 100.0 if v['classes_f1']['diabetic_retinopathy']['mean'] > 1.0 else v['classes_f1']['diabetic_retinopathy']['mean'],
+                    'Glaucoma': v['classes_f1']['glaucoma']['mean'] / 100.0 if v['classes_f1']['glaucoma']['mean'] > 1.0 else v['classes_f1']['glaucoma']['mean'],
+                    'Normal': v['classes_f1']['normal']['mean'] / 100.0 if v['classes_f1']['normal']['mean'] > 1.0 else v['classes_f1']['normal']['mean'],
+                    'Retina Dis.': v['classes_f1']['retina_disease']['mean'] / 100.0 if v['classes_f1']['retina_disease']['mean'] > 1.0 else v['classes_f1']['retina_disease']['mean']
+                }
+            }
+            # Guardamos las desviaciones estándar correspondientes
+            MODELS_ERRORS[pres_name] = {
+                'accuracy_std': v['accuracy']['std'],
+                'f1_std': v['f1_weighted']['std'],
+                'latency_std': v['avg_latency_ms']['std'],
+                'class_f1_std': {
+                    'Catarata': v['classes_f1']['cataract']['std'] / 100.0 if v['classes_f1']['cataract']['std'] > 1.0 else v['classes_f1']['cataract']['std'],
+                    'Ret. Diabética': v['classes_f1']['diabetic_retinopathy']['std'] / 100.0 if v['classes_f1']['diabetic_retinopathy']['std'] > 1.0 else v['classes_f1']['diabetic_retinopathy']['std'],
+                    'Glaucoma': v['classes_f1']['glaucoma']['std'] / 100.0 if v['classes_f1']['glaucoma']['std'] > 1.0 else v['classes_f1']['glaucoma']['std'],
+                    'Normal': v['classes_f1']['normal']['std'] / 100.0 if v['classes_f1']['normal']['std'] > 1.0 else v['classes_f1']['normal']['std'],
+                    'Retina Dis.': v['classes_f1']['retina_disease']['std'] / 100.0 if v['classes_f1']['retina_disease']['std'] > 1.0 else v['classes_f1']['retina_disease']['std']
+                }
+            }
+else:
+    print("Warning: comparison_summary_consolidated.json not found, using hardcoded fallback.")
+    MODELS_DATA = {
+        'ResNet50': {
+            'accuracy': 75.25, 'f1': 76.67, 'precision': 80.17, 'recall': 75.25, 'latency': 65.14,
+            'class_f1': {'Catarata': 0.85, 'Ret. Diabética': 0.83, 'Glaucoma': 0.69, 'Normal': 0.58, 'Retina Dis.': 0.43}
+        },
+        'DenseNet121': {
+            'accuracy': 69.20, 'f1': 71.63, 'precision': 77.92, 'recall': 69.20, 'latency': 39.32,
+            'class_f1': {'Catarata': 0.83, 'Ret. Diabética': 0.78, 'Glaucoma': 0.67, 'Normal': 0.51, 'Retina Dis.': 0.37}
+        },
+        'EfficientNetV2-S': {
+            'accuracy': 61.44, 'f1': 58.13, 'precision': 61.15, 'recall': 61.44, 'latency': 41.69,
+            'class_f1': {'Catarata': 0.68, 'Ret. Diabética': 0.74, 'Glaucoma': 0.49, 'Normal': 0.13, 'Retina Dis.': 0.39}
+        },
+        'Swin-T (SUNet)': {
+            'accuracy': 73.82, 'f1': 74.69, 'precision': 76.94, 'recall': 73.82, 'latency': 32.40,
+            'class_f1': {'Catarata': 0.83, 'Ret. Diabética': 0.84, 'Glaucoma': 0.68, 'Normal': 0.49, 'Retina Dis.': 0.37}
+        },
+        'YOLOv8m-cls': {
+            'accuracy': 75.69, 'f1': 75.86, 'precision': 77.74, 'recall': 75.69, 'latency': 26.61,
+            'class_f1': {'Catarata': 0.75, 'Ret. Diabética': 0.85, 'Glaucoma': 0.65, 'Normal': 0.62, 'Retina Dis.': 0.21}
+        },
+        'YOLO11m-cls': {
+            'accuracy': 75.84, 'f1': 74.34, 'precision': 75.15, 'recall': 75.84, 'latency': 28.28,
+            'class_f1': {'Catarata': 0.83, 'Ret. Diabética': 0.83, 'Glaucoma': 0.70, 'Normal': 0.48, 'Retina Dis.': 0.32}
+        }
+    }
+    MODELS_ERRORS = {m: {'accuracy_std': 0.0, 'f1_std': 0.0, 'latency_std': 0.0, 'class_f1_std': {c: 0.0 for c in ['Catarata', 'Ret. Diabética', 'Glaucoma', 'Normal', 'Retina Dis.']}} for m in MODELS_DATA}
+
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 RESULT_DIR   = PROJECT_ROOT / "results"
@@ -148,11 +207,11 @@ def plot_latencies_comparison():
     ax.set_xlabel("Tiempo de Inferencia (milisegundos)", fontweight='bold')
     ax.set_yticks(y)
     ax.set_yticklabels(models, fontweight='semibold')
-    ax.set_xlim(0, 45)
+    ax.set_xlim(0, 75)
     ax.grid(axis='x', linestyle=':', alpha=0.4)
     
     # Agregar nota sobre batch sizes
-    ax.text(12, 1.2, "ResNet/Dense/EffNet: Batch 64\nSwin Transformer: Batch 32\nYOLOv8/11: Batch 1 (con TTA)", 
+    ax.text(38, 1.2, "Todos los modelos: Batch 1\n(con TTA geométrico de 5 vistas en GPU)", 
             bbox=dict(boxstyle="round,pad=0.5", facecolor="#f1f5f9", edgecolor="none", alpha=0.9),
             fontsize=8.5, color="#475569")
             
@@ -235,7 +294,7 @@ def plot_combined_dashboard():
     ax2.set_xlabel("Tiempo (milisegundos)")
     ax2.set_yticks(x)
     ax2.set_yticklabels(models, fontsize=9, fontweight='semibold')
-    ax2.set_xlim(0, 46)
+    ax2.set_xlim(0, 76)
     ax2.grid(axis='x', linestyle=':', alpha=0.4)
     
     # ─── Panel 3: Desempeño por Clase (Bottom) ───

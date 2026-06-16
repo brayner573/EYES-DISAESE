@@ -1,0 +1,19 @@
+ResNet50 Classification Report — resnet50_20260603_173620
+=================================================================
+
+                      precision    recall  f1-score   support
+
+            cataract       0.80      0.79      0.79       201
+diabetic_retinopathy       0.76      0.81      0.78       665
+            glaucoma       0.95      0.36      0.52       193
+              normal       0.38      0.30      0.33       227
+      retina_disease       0.08      0.80      0.15        15
+
+            accuracy                           0.65      1301
+           macro avg       0.59      0.61      0.52      1301
+        weighted avg       0.72      0.65      0.66      1301
+
+Accuracy: 0.6487
+Precision: 0.7198
+Recall: 0.6487
+F1-score: 0.6606

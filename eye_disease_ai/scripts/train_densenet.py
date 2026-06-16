@@ -69,7 +69,7 @@ def get_optimal_config():
         else:
             cfg["batch_size"], cfg["num_workers"] = 16, 2
         if os.name == "nt":
-            cfg["num_workers"] = min(cfg["num_workers"], 4)
+            cfg["num_workers"] = 0
         torch.backends.cudnn.benchmark = True
     return cfg
 
@@ -416,10 +416,24 @@ def main():
                                     args.epochs_head, "Fase 1 — Solo Cabeza", cfg["amp"], 
                                     args.patience, tb_writer=tb_writer, epoch_offset=0)
 
-    # Fase 2: Fine-Tuning completo
+    # Fase 2: Fine-Tuning completo con tasas de aprendizaje diferenciales
     for param in model.parameters():
         param.requires_grad = True
-    opt2 = optim.AdamW(model.parameters(), lr=args.lr_fine, weight_decay=1e-4)
+        
+    # Agrupar parámetros para aplicar tasas de aprendizaje diferenciales (evita colapso de características pretrained)
+    backbone_params = []
+    head_params = []
+    for name, param in model.named_parameters():
+        if "classifier" in name:
+            head_params.append(param)
+        else:
+            backbone_params.append(param)
+            
+    opt2 = optim.AdamW([
+        {"params": backbone_params, "lr": args.lr_fine * 0.1},  # 10x menor para el backbone
+        {"params": head_params, "lr": args.lr_fine}            # LR normal para la cabeza
+    ], weight_decay=1e-4)
+    
     sch2 = ReduceLROnPlateau(opt2, mode='min', factor=0.5, patience=3)
     
     model, h2, _ = train_phase(model, dataloaders, dataset_sizes, opt2, sch2,

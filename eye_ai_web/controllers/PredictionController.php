@@ -122,7 +122,7 @@ class PredictionController {
                     'predicted_class' => $bestResult['class'],
                     'confidence'      => $bestResult['confidence'],
                     'model_used'      => 'COMPARE: Todos los Modelos',
-                    'all_predictions' => json_encode($bestResult['all_predictions'] ?? []),
+                    'all_predictions' => json_encode($results), // Guardamos TODOS los modelos comparados
                     'processing_time' => $totalTime,
                 ]);
                 $this->userModel->logActivity(
@@ -163,21 +163,12 @@ class PredictionController {
                 $primaryResult = $yoloResult;
             }
 
+            // NO se guarda en base de datos para comparativas parciales de dos modelos
             $predId = null;
             if ($primaryResult) {
-                $predId = $this->predModel->create([
-                    'user_id'         => currentUserId(),
-                    'image_path'      => $relativePath,
-                    'image_original'  => sanitize($file['name']),
-                    'predicted_class' => $primaryResult['class'],
-                    'confidence'      => $primaryResult['confidence'],
-                    'model_used'      => 'COMPARE: ResNet50 + YOLOv8',
-                    'all_predictions' => json_encode($primaryResult['all_predictions'] ?? []),
-                    'processing_time' => ($resnetResult['processing_time'] ?? 0) + ($yoloResult['processing_time'] ?? 0),
-                ]);
                 $this->userModel->logActivity(
                     currentUserId(), 'PREDICTION_COMPARE',
-                    "Comparativa: ResNet={$resnetResult['class']} YOLOv8={$yoloResult['class']}"
+                    "Comparativa Dual (Sin reporte): ResNet={$resnetResult['class']} YOLOv8={$yoloResult['class']}"
                 );
             }
 
@@ -186,7 +177,7 @@ class PredictionController {
                 'image_path'   => $relativePath,
                 'resnet'       => $resnetResult,
                 'yolo'         => $yoloResult,
-                'prediction'   => $predId ? $this->predModel->findById($predId) : null,
+                'prediction'   => null,
             ];
             require VIEWS_PATH . '/user/result_compare.php';
             return;
@@ -201,7 +192,14 @@ class PredictionController {
             redirect('/prediction/form');
         }
 
-        $predId = $this->predModel->create([
+        // NO se guarda en base de datos para análisis individuales
+        $this->userModel->logActivity(
+            currentUserId(), 'PREDICTION',
+            "Individual (Sin reporte) - Class: {$result['class']}, Conf: {$result['confidence']}%, Model: {$result['model']}"
+        );
+
+        $tempPred = [
+            'id'              => 0,
             'user_id'         => currentUserId(),
             'image_path'      => $relativePath,
             'image_original'  => sanitize($file['name']),
@@ -210,15 +208,11 @@ class PredictionController {
             'model_used'      => $result['model'],
             'all_predictions' => json_encode($result['all_predictions'] ?? []),
             'processing_time' => $result['processing_time'] ?? 0,
-        ]);
-
-        $this->userModel->logActivity(
-            currentUserId(), 'PREDICTION',
-            "Class: {$result['class']}, Conf: {$result['confidence']}%, Model: {$result['model']}"
-        );
+            'created_at'      => date('Y-m-d H:i:s')
+        ];
 
         $data = [
-            'prediction' => $this->predModel->findById($predId),
+            'prediction' => $tempPred,
             'result'     => $result,
         ];
         require VIEWS_PATH . '/user/result.php';
@@ -280,21 +274,33 @@ class PredictionController {
             redirect('/prediction/history');
         }
 
-        // Reconstruir el formato esperado por result.php
-        $result = [
-            'class'           => $pred['predicted_class'],
-            'confidence'      => $pred['confidence'],
-            'model'           => $pred['model_used'],
-            'all_predictions' => json_decode($pred['all_predictions'], true) ?? [],
-            'processing_time' => $pred['processing_time'],
-        ];
+        // Si el reporte corresponde a una comparación de todos los modelos
+        if ($pred['model_used'] === 'COMPARE: Todos los Modelos') {
+            $results = json_decode($pred['all_predictions'], true) ?? [];
+            $data = [
+                'compare_all_mode' => true,
+                'image_path'       => $pred['image_path'],
+                'results'          => $results,
+                'prediction'       => $pred,
+            ];
+            require VIEWS_PATH . '/user/result_compare.php';
+        } else {
+            // Reconstruir el formato esperado por result.php (para retrocompatibilidad)
+            $result = [
+                'class'           => $pred['predicted_class'],
+                'confidence'      => $pred['confidence'],
+                'model'           => $pred['model_used'],
+                'all_predictions' => json_decode($pred['all_predictions'], true) ?? [],
+                'processing_time' => $pred['processing_time'],
+            ];
 
-        $data = [
-            'prediction' => $pred,
-            'result'     => $result,
-        ];
+            $data = [
+                'prediction' => $pred,
+                'result'     => $result,
+            ];
 
-        require VIEWS_PATH . '/user/result.php';
+            require VIEWS_PATH . '/user/result.php';
+        }
     }
 
     /** Mensajes de error de upload */
