@@ -164,9 +164,20 @@ python scripts/generate_results_dashboard.py
 
 ---
 
-### 2️⃣ Portal Web (`eye_ai_web`)
+### 2️⃣ Servidor de IA & Portal Web (`eye_ai_web`)
 
-#### Opción A: Servidor PHP integrado (desarrollo rápido)
+#### Paso A: Iniciar el Microservicio de IA (FastAPI)
+
+```powershell
+# Activar entorno e iniciar servidor FastAPI
+cd D:\MODELO_EYES\eye_ai_web\python_ai
+..\..\eye_disease_ai\venv\Scripts\python.exe fastapi_server.py
+```
+*El servidor se iniciará en `http://127.0.0.1:8000` precargando los 6 modelos en memoria GPU/CPU.*
+
+#### Paso B: Iniciar el Portal Web PHP
+
+##### Opción 1: Servidor PHP integrado (desarrollo rápido)
 
 ```powershell
 cd D:\MODELO_EYES\eye_ai_web
@@ -174,15 +185,15 @@ cd D:\MODELO_EYES\eye_ai_web
 # Inicializar la base de datos (solo la primera vez)
 php setup_db.php
 
-# Iniciar servidor de desarrollo
-php -S localhost:8000 router.php
+# Iniciar servidor web en puerto 8080
+php -S localhost:8080 router.php
 ```
 
-Accede a **http://localhost:8000** y usa las credenciales:
+Accede a **http://localhost:8080** y usa las credenciales:
 - **Correo**: `admin@eyeai.com`
 - **Contraseña**: `Admin123!`
 
-#### Opción B: Apache / XAMPP
+##### Opción 2: Apache / XAMPP
 
 1. Copia la carpeta `eye_ai_web/` a `htdocs/`.
 2. Importa el schema: `mysql -u root < eye_ai_web/database/eye_ai.sql`
@@ -208,6 +219,7 @@ flutter run
 
 | Optimización | Descripción |
 |---|---|
+| **Microservicio FastAPI** | Carga permanente de los 6 modelos en memoria GPU/CPU, reduciendo latencia y eliminando el overhead de shell_exec. |
 | **Mixed Precision (AMP)** | Reduce VRAM ~50% con float16, acelerando la inferencia GPU. |
 | **cuDNN Auto-Tuning** | Benchmark automático de kernels de convolución óptimos. |
 | **Test-Time Augmentation** | Ensemble de 5 vistas geométricas para mayor robustez. |
@@ -235,7 +247,7 @@ MODELO_EYES/
 │   ├── controllers/            # AuthController, UserController, PredictionController, ApiController
 │   ├── models/                 # Database (PDO Singleton), User, Prediction
 │   ├── views/                  # Vistas PHP (auth, user, admin, errors)
-│   ├── python_ai/              # predict_web.py — bridge PHP → PyTorch
+│   ├── python_ai/              # fastapi_server.py — Microservicio API REST FastAPI (Inferencia en RAM/VRAM)
 │   ├── routes/                 # web.php — definición de rutas MVC
 │   ├── assets/                 # CSS, JS
 │   ├── database/               # eye_ai.sql — schema completo
