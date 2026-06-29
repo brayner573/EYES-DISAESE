@@ -37,10 +37,13 @@ define('ALLOWED_MIME_TYPES', [
     'image/jpeg', 'image/png', 'image/bmp', 'image/webp'
 ]);
 
-// ─── Configuración de IA / Python ────────────────────────────
+// ─── Configuración de IA / Python (Microservicio API REST FastAPI) ─────────
+define('AI_SERVICE_URL', 'http://127.0.0.1:8000');
+define('AI_SERVICE_TIMEOUT', 30); // Tiempo límite en segundos para peticiones HTTP
 define('PYTHON_PATH', 'D:\\MODELO_EYES\\eye_disease_ai\\venv\\Scripts\\python.exe');
 define('AI_PROJECT_PATH', 'D:\\MODELO_EYES\\eye_disease_ai');
-define('PREDICT_SCRIPT', ROOT_PATH . '/python_ai/predict_web.py');
+define('PREDICT_SCRIPT', ROOT_PATH . '/python_ai/fastapi_server.py');
+
 
 // Modelos disponibles
 define('AI_MODELS', [

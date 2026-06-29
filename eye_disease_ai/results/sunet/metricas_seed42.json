@@ -1,0 +1,43 @@
+{
+  "model": "Swin Transformer (SUNet)",
+  "seed": 42,
+  "accuracy": 0.8639508070714835,
+  "precision_weighted": 0.8755925069269924,
+  "recall_weighted": 0.8639508070714835,
+  "f1_weighted": 0.8668677114925403,
+  "auc_roc_macro": 0.9749553194375556,
+  "avg_latency_ms": 32.43599993554012,
+  "total_test_images": 1301,
+  "classes": {
+    "cataract": {
+      "precision": 0.896551724137931,
+      "recall": 0.9054726368159204,
+      "f1_score": 0.900990099009901,
+      "support": 201
+    },
+    "diabetic_retinopathy": {
+      "precision": 0.932824427480916,
+      "recall": 0.9187969924812031,
+      "f1_score": 0.9257575757575758,
+      "support": 665
+    },
+    "glaucoma": {
+      "precision": 0.9096774193548387,
+      "recall": 0.7305699481865285,
+      "f1_score": 0.8103448275862069,
+      "support": 193
+    },
+    "normal": {
+      "precision": 0.69140625,
+      "recall": 0.7797356828193832,
+      "f1_score": 0.7329192546583851,
+      "support": 227
+    },
+    "retina_disease": {
+      "precision": 0.40625,
+      "recall": 0.8666666666666667,
+      "f1_score": 0.5531914893617021,
+      "support": 15
+    }
+  }
+}

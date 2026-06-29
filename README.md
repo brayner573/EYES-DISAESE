@@ -18,41 +18,42 @@ El ecosistema se divide en **tres componentes** perfectamente integrados:
 
 ```mermaid
 graph TD
-    subgraph AI["🔬 eye_disease_ai (AI Core)"]
+    subgraph AI["🔬 eye_disease_ai (AI Core & Microservicio FastAPI)"]
         A[Imágenes Fundoscópicas] --> B[scripts/split_data.py]
         B --> C[Dataset Train / Val / Test]
         C --> D[YOLOv8m / YOLO11m Classifiers]
         C --> E[ResNet50 / DenseNet121 / EfficientNetV2 / SUNet]
         D --> F[Métricas & Pesos .pt / .pth]
         E --> F
+        F -->|Precarga en VRAM/RAM| FASTAPI[python_ai/fastapi_server.py]
     end
 
     subgraph Web["💻 eye_ai_web (Portal PHP MVC)"]
         G[Usuario / Admin] -->|Sube imagen| H[PredictionController]
-        H -->|Llama script| I[python_ai/predict_web.py]
-        I -->|Carga pesos entrenados| F
-        I -->|Retorna JSON| H
+        H -->|Petición HTTP cURL POST| FASTAPI
+        FASTAPI -->|Responde JSON milisegundos| H
         H -->|Persiste resultado| J[(MySQL eye_ai_db)]
         H -->|Muestra reporte clínico| K[Vista resultado.php]
     end
 
     subgraph Mobile["📱 eye_disease_mobile (Flutter)"]
-        L[App Android / iOS] -->|API REST| M[ApiController.php]
+        L[App Android / iOS] -->|API REST HTTP| M[ApiController.php]
         M --> J
-        M --> I
+        M -->|Petición HTTP cURL| FASTAPI
     end
 ```
 
-### 1. `eye_disease_ai` — AI Core & Scripts de Entrenamiento
-Módulo de procesamiento, entrenamiento y evaluación comparativa de modelos Deep Learning.
+### 1. `eye_disease_ai` — AI Core & Servidor de Inferencia FastAPI
+Módulo de procesamiento, entrenamiento y servidor continuo de inferencia en tiempo real.
 - **6 Modelos**: YOLOv8m-cls, YOLO11m-cls, ResNet50, DenseNet121, EfficientNetV2-S, Swin Transformer (SUNet).
 - **Pipeline**: Preparación ➔ Data Augmentation ➔ Entrenamiento GPU (AMP + cuDNN) ➔ Evaluación con 3 seeds y TTA.
+- **Microservicio FastAPI**: Carga permanente de modelos en memoria GPU/CPU para respuesta ultrasrápida en milisegundos sin latencia de arranque.
 
 ### 2. `eye_ai_web` — Portal de Diagnóstico Web (PHP MVC)
-Plataforma web profesional bajo el patrón **MVC** en PHP puro, sin frameworks pesados.
+Plataforma web profesional bajo el patrón **MVC** en PHP puro, desacoplada del motor de IA.
 - **Módulos**: Autenticación JWT-session, Panel Usuario, Historial Clínico, Comparador de Modelos (hasta 6 a la vez), Panel Admin.
 - **API REST** (`/api/*`): Endpoints para la app móvil con autenticación basada en tokens de sesión.
-- **Inferencia en Tiempo Real**: Integración directa con PyTorch mediante `shell_exec`.
+- **Inferencia en Tiempo Real**: Comunicación segura y desacoplada vía cliente HTTP cURL hacia el microservicio FastAPI.
 
 ### 3. `eye_disease_mobile` — Aplicación Móvil (Flutter)
 Aplicación multiplataforma (Android / iOS) que consume la API REST del portal web.

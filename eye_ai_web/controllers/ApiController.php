@@ -288,45 +288,57 @@ class ApiController {
     }
 
     /**
-     * Ejecutar script Python de predicción
+     * Ejecutar predicción vía API REST FastAPI (cURL)
      */
     private function runPrediction(string $imagePath, string $modelKey): ?array {
-        $pythonPath = PYTHON_PATH;
-        $scriptPath = PREDICT_SCRIPT;
+        $url = AI_SERVICE_URL . '/predict';
+        $payload = json_encode([
+            'image_path' => $imagePath,
+            'model'      => $modelKey
+        ]);
 
-        $imagePath = str_replace('/', '\\', $imagePath);
-        $cmd = sprintf(
-            '%s "%s" "%s" "%s" 2>&1',
-            escapeshellarg($pythonPath),
-            $scriptPath,
-            $imagePath,
-            $modelKey
-        );
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => $payload,
+            CURLOPT_HTTPHEADER     => [
+                'Content-Type: application/json',
+                'Content-Length: ' . strlen($payload)
+            ],
+            CURLOPT_TIMEOUT        => AI_SERVICE_TIMEOUT,
+            CURLOPT_CONNECTTIMEOUT => 5,
+        ]);
 
         $startTime = microtime(true);
-        $output    = shell_exec($cmd);
+        $response  = curl_exec($ch);
         $elapsed   = round((microtime(true) - $startTime) * 1000, 2);
+        $errno     = curl_errno($ch);
+        $error     = curl_error($ch);
+        $httpCode  = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
 
-        if (empty($output)) {
-            return ["error_raw" => "Output vacío del comando Python."];
+        if ($errno) {
+            return [
+                "error_raw" => "No se pudo conectar al microservicio de IA (" . AI_SERVICE_URL . "). Detalle: " . $error
+            ];
         }
 
-        // Buscar patrón JSON en el output de consola
-        if (preg_match('/\{[^{}]*"class"[^{}]*\}/', $output, $matches)) {
-            $result = json_decode($matches[0], true);
-            if ($result && isset($result['class'])) {
-                $result['processing_time'] = $elapsed;
-                return $result;
-            }
+        $result = json_decode($response, true);
+
+        if ($httpCode !== 200) {
+            $detail = $result['detail'] ?? $response;
+            return ["error_raw" => "Error del microservicio IA (HTTP $httpCode): " . (is_array($detail) ? json_encode($detail) : $detail)];
         }
 
-        $result = json_decode(trim($output), true);
         if ($result && isset($result['class'])) {
-            $result['processing_time'] = $elapsed;
+            if (!isset($result['processing_time'])) {
+                $result['processing_time'] = $elapsed;
+            }
             return $result;
         }
 
-        return ["error_raw" => "Error Python: " . $output];
+        return ["error_raw" => "Respuesta no válida del servicio de IA: " . $response];
     }
 
     /**
